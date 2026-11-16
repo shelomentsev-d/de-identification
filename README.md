@@ -38,4 +38,3 @@ De-identification работает локально: исходный файл �
 - Windows 10/11 x64: `De-identification-Setup.exe`.
 
 На macOS откройте DMG и перетащите `De-identification` на ярлык `Applications`. На Windows запустите installer и откройте De-identification из меню Start или с рабочего стола.
-
