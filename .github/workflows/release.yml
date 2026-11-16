@@ -25,26 +25,26 @@ jobs:
           python -m pip install -r requirements-build.txt
       - name: Build application
         run: |
-          python -m PyInstaller --clean --noconfirm pyinstaller/pii_mask.spec
+          python -m PyInstaller --clean --noconfirm pyinstaller/de-Identification.spec
       - name: Create DMG
         run: |
           mkdir -p dist/dmg
-          xattr -cr "dist/De-identification.app"
-          codesign --force --deep --sign - "dist/De-identification.app"
+          xattr -cr "dist/de-Identification.app"
+          codesign --force --deep --sign - "dist/de-Identification.app"
           mkdir -p dist/dmg-root
-          cp -R "dist/De-identification.app" dist/dmg-root/
+          cp -R "dist/de-Identification.app" dist/dmg-root/
           ln -s /Applications dist/dmg-root/Applications
-          hdiutil create -volname "De-identification" -srcfolder dist/dmg-root -ov -format UDZO "dist/dmg/De-identification.dmg"
+          hdiutil create -volname "de-Identification" -srcfolder dist/dmg-root -ov -format UDZO "dist/dmg/de-Identification.dmg"
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: De-identification-macOS
-          path: dist/dmg/De-identification.dmg
+          name: de-Identification-macOS
+          path: dist/dmg/de-Identification.dmg
       - name: Attach macOS artifact to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/dmg/De-identification.dmg
+          files: dist/dmg/de-Identification.dmg
 
   windows:
     runs-on: windows-2022
@@ -61,18 +61,18 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-build.txt
       - name: Build application
-        run: python -m PyInstaller --clean --noconfirm pyinstaller/pii_mask.spec
+        run: python -m PyInstaller --clean --noconfirm pyinstaller/de-Identification.spec
       - name: Build Windows installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
-          path: installer/De-identification.iss
+          path: installer/de-Identification.iss
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: De-identification-Windows
-          path: dist/windows/De-identification-Setup.exe
+          name: de-Identification-Windows
+          path: dist/windows/de-Identification-Setup.exe
       - name: Attach Windows artifact to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/windows/De-identification-Setup.exe
+          files: dist/windows/de-Identification-Setup.exe

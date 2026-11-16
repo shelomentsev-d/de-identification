@@ -1,4 +1,4 @@
-"""PII span detection and token mapping."""
+"""personal data span detection and token mapping."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from .rules import LABELS, REGEX_RULES, filter_overlaps
 
 
 class Masker:
-    """Find PII spans and replace them with stable per-document tokens."""
+    """Find personal data spans and replace them with stable per-document tokens."""
 
     def __init__(self, enable_ner: bool = True):
         self.mapping: dict[str, str] = {}

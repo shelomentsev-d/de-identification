@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-pii_kit.py - локальная маскировка персональных данных и обратная замена.
+de_Identification.py - локальная маскировка персональных данных и обратная замена.
 Работает полностью на вашем Mac, ничего не отправляет в сеть.
 
 Использование:
-    python3 pii_kit.py clean договор.docx        -> договор_clean.docx + договор_keys.json
-    python3 pii_kit.py clean договор.pdf         -> договор_clean.md   + договор_keys.json
-    python3 pii_kit.py restore ответ.txt         -> ответ_restored.txt (использует найденный _keys.json)
+    python3 de_Identification.py clean договор.docx        -> договор_clean.docx + договор_keys.json
+    python3 de_Identification.py clean договор.pdf         -> договор_clean.md   + договор_keys.json
+    python3 de_Identification.py restore ответ.txt         -> ответ_restored.txt (использует найденный _keys.json)
 
 Поддерживаемые форматы: .docx (текст и таблицы, форматирование сохраняется),
 .xlsx, .pptx, .txt, .md, .csv, .pdf (с текстовым слоем, извлекается в .md).
@@ -235,7 +235,7 @@ def cmd_restore(args):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Локальная маскировка PII (офлайн)")
+    ap = argparse.ArgumentParser(description="Локальная маскировка personal data (офлайн)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("clean", help="обезличить файл перед отправкой в нейросеть")
     c.add_argument("file")

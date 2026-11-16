@@ -1,4 +1,4 @@
-"""Stable API around the existing pii_kit.py implementation.
+"""Stable API around the existing de_Identification.py implementation.
 
 This first extraction changes the dependency boundary, not the masking rules.
 """
@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Optional, Union
 
-import pii_kit
+import de_Identification
 
 
 class EngineError(Exception):
@@ -87,17 +87,17 @@ def mask(
     """Mask one supported file using the existing prototype processors."""
     source = Path(path)
     _validate_input(source)
-    masker = pii_kit.Masker(
+    masker = de_Identification.Masker(
         enable_ner=True if config is None else config.enable_ner
     )
     processors = {
-        ".docx": pii_kit.process_docx,
-        ".xlsx": pii_kit.process_xlsx,
-        ".pptx": pii_kit.process_pptx,
-        ".pdf": pii_kit.process_pdf,
-        ".txt": pii_kit.process_text,
-        ".md": pii_kit.process_text,
-        ".csv": pii_kit.process_text,
+        ".docx": de_Identification.process_docx,
+        ".xlsx": de_Identification.process_xlsx,
+        ".pptx": de_Identification.process_pptx,
+        ".pdf": de_Identification.process_pdf,
+        ".txt": de_Identification.process_text,
+        ".md": de_Identification.process_text,
+        ".csv": de_Identification.process_text,
     }
     try:
         processor = processors[source.suffix.lower()]
@@ -148,7 +148,7 @@ def restore(text: str, mapping: Mapping[str, str]) -> RestoreResult:
     """Restore tokens using the current legacy key format.
 
     Missing values are reported by token, not by real value, so callers can
-    display diagnostics without exposing PII in logs.
+    display diagnostics without exposing personal data in logs.
     """
     restored = text
     replacements = 0

@@ -1,4 +1,4 @@
-"""Application-facing API for the PII Mask engine."""
+"""Application-facing API for the de-Identification engine."""
 
 from .masker import Masker
 from .api import (

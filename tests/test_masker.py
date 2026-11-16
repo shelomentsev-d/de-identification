@@ -5,13 +5,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-import pii_kit  # noqa: E402
+import de_Identification  # noqa: E402
 from engine.masker import Masker  # noqa: E402
 
 
 class MaskerExtractionTests(unittest.TestCase):
     def test_legacy_module_uses_extracted_masker(self):
-        self.assertIs(pii_kit.Masker, Masker)
+        self.assertIs(de_Identification.Masker, Masker)
 
     def test_regex_only_mode_masks_without_ner(self):
         masker = Masker(enable_ner=False)

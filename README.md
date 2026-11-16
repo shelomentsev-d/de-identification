@@ -1,8 +1,8 @@
-# De-identification
+# de-Identification
 
 Локальное macOS/Windows-приложение для маскировки персональных данных перед отправкой документов в облачные нейросети.
 
-De-identification работает локально: исходный файл не изменяется, рядом создаётся копия с токенами вида `[PHONE_1]`, а файл `*_keys.json` остаётся на компьютере пользователя.
+de-Identification работает локально: исходный файл не изменяется, рядом создаётся копия с токенами вида `[PHONE_1]`, а файл `*_keys.json` остаётся на компьютере пользователя.
 
 ## Что поддерживается
 
@@ -34,7 +34,7 @@ De-identification работает локально: исходный файл �
 
 Готовые установщики публикуются на странице **GitHub Releases**:
 
-- macOS: `De-identification.dmg`;
-- Windows 10/11 x64: `De-identification-Setup.exe`.
+- macOS: `de-Identification.dmg`;
+- Windows 10/11 x64: `de-Identification-Setup.exe`.
 
-На macOS откройте DMG и перетащите `De-identification` на ярлык `Applications`. На Windows запустите installer и откройте De-identification из меню Start или с рабочего стола.
+На macOS откройте DMG и перетащите `de-Identification` на ярлык `Applications`. На Windows запустите installer и откройте de-Identification из меню Start или с рабочего стола.

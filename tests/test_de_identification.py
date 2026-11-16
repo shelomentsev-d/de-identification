@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Baseline tests for the current pii_kit.py behavior.
+"""Baseline tests for the current de_Identification.py behavior.
 
 These tests intentionally describe the existing prototype before extracting
 an engine package. They should be kept green during the first refactor.
@@ -16,7 +16,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-import pii_kit  # noqa: E402
+import de_Identification  # noqa: E402
 
 
 class MaskerTests(unittest.TestCase):
@@ -28,7 +28,7 @@ class MaskerTests(unittest.TestCase):
             "email test.person@example.ru, дата 15.03.1985 г."
         )
 
-        masker = pii_kit.Masker()
+        masker = de_Identification.Masker()
         cleaned = masker.mask_text(text)
 
         for label in (
@@ -50,7 +50,7 @@ class MaskerTests(unittest.TestCase):
         self.assertNotIn("test.person@example.ru", cleaned)
 
     def test_repeated_value_gets_same_token(self):
-        masker = pii_kit.Masker()
+        masker = de_Identification.Masker()
 
         cleaned = masker.mask_text("Телефон +7 999 123-45-67 и снова +7 999 123-45-67.")
 
@@ -67,7 +67,7 @@ class MaskerTests(unittest.TestCase):
         ]
 
         self.assertEqual(
-            pii_kit.filter_overlaps(spans),
+            de_Identification.filter_overlaps(spans),
             [(0, 10, "B", "long"), (12, 14, "D", "next")],
         )
 
@@ -96,7 +96,7 @@ class RestoreTests(unittest.TestCase):
             )
 
             args = type("Args", (), {"answer_file": str(answer), "keys": str(keys)})
-            pii_kit.cmd_restore(args)
+            de_Identification.cmd_restore(args)
 
             restored = (root / "answer_restored.txt").read_text(encoding="utf-8")
             self.assertEqual(
@@ -113,8 +113,8 @@ class FileProcessingTests(unittest.TestCase):
             original = "Контакт: +7 999 123-45-67\n"
             source.write_text(original, encoding="utf-8")
 
-            masker = pii_kit.Masker()
-            output = pii_kit.process_text(source, masker)
+            masker = de_Identification.Masker()
+            output = de_Identification.process_text(source, masker)
 
             self.assertEqual(output.name, "договор test_clean.txt")
             self.assertEqual(source.read_text(encoding="utf-8"), original)

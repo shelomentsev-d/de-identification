@@ -1,4 +1,4 @@
-"""Built-in PII labels, regular expressions, and span conflict handling."""
+"""Built-in personal data labels, regular expressions, and span conflict handling."""
 
 from __future__ import annotations
 

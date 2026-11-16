@@ -1,1 +1,1 @@
-"""Application layer for the PII Mask desktop MVP."""
+"""Application layer for the de-Identification desktop MVP."""

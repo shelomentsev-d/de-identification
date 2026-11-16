@@ -10,8 +10,8 @@ a = Analysis(
     pathex=[str(project)],
     binaries=[],
     datas=[
-        (str(project / "assets" / "De-identification.icns"), "."),
-        (str(project / "assets" / "De-identification.ico"), "."),
+        (str(project / "assets" / "de-Identification.icns"), "."),
+        (str(project / "assets" / "de-Identification.ico"), "."),
     ],
     hiddenimports=[
         "docx",
@@ -34,13 +34,13 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="De-identification",
+    name="de-Identification",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
     console=False,
-    icon=str(project / "assets" / "De-identification.ico") if sys.platform == "win32" else None,
+    icon=str(project / "assets" / "de-Identification.ico") if sys.platform == "win32" else None,
     disable_windowed_traceback=False,
 )
 
@@ -50,13 +50,13 @@ coll = COLLECT(
     a.datas,
     strip=False,
     upx=False,
-    name="De-identification",
+    name="de-Identification",
 )
 
 if sys.platform == "darwin":
     app = BUNDLE(
         coll,
-        name="De-identification.app",
-        icon=str(project / "assets" / "De-identification.icns"),
-        bundle_identifier="org.deidentification.app",
+        name="de-Identification.app",
+        icon=str(project / "assets" / "de-Identification.icns"),
+        bundle_identifier="org.deIdentification.app",
     )

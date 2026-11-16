@@ -1,4 +1,4 @@
-"""PySide6 desktop interface for local PII masking and restoration."""
+"""PySide6 desktop interface for local personal data masking and restoration."""
 
 from __future__ import annotations
 
@@ -190,7 +190,7 @@ class MainWindow(QMainWindow):
         self.queue = FileQueue()
         self.thread: Optional[QThread] = None
         self.worker: Optional[MaskWorker] = None
-        self.setWindowTitle("De-identification")
+        self.setWindowTitle("de-Identification")
         self.resize(1000, 700)
         self.setStyleSheet(APP_STYLE)
         self._build_ui()
@@ -201,7 +201,7 @@ class MainWindow(QMainWindow):
         root = QVBoxLayout(central)
         root.setContentsMargins(28, 24, 28, 24)
         root.setSpacing(16)
-        title = QLabel("De-identification")
+        title = QLabel("de-Identification")
         title.setObjectName("title")
         subtitle = QLabel("Обезличьте документы перед отправкой и верните данные после ответа нейросети.")
         subtitle.setObjectName("subtitle")

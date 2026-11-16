@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch the De-identification desktop application."""
+"""Launch the de-Identification desktop application."""
 
 from __future__ import annotations
 
