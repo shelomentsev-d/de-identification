@@ -39,36 +39,3 @@ De-identification работает локально: исходный файл �
 
 На macOS откройте DMG и перетащите `De-identification` на ярлык `Applications`. На Windows запустите installer и откройте De-identification из меню Start или с рабочего стола.
 
-## Сборка релиза
-
-Локальная сборка macOS:
-
-```bash
-python3.13 -m venv .venv
-.venv/bin/pip install -r requirements-build.txt
-.venv/bin/python -m PyInstaller --clean --noconfirm pyinstaller/pii_mask.spec
-xattr -cr "dist/De-identification.app"
-mkdir -p dist/dmg
-mkdir -p dist/dmg-root
-rm -rf dist/dmg-root/*
-cp -R "dist/De-identification.app" dist/dmg-root/
-ln -s /Applications dist/dmg-root/Applications
-hdiutil create -volname "De-identification" -srcfolder dist/dmg-root -ov -format UDZO dist/dmg/De-identification.dmg
-```
-
-Windows-сборка выполняется в GitHub Actions на Windows runner. Workflow `.github/workflows/release.yml` запускается автоматически после публикации тега вида `v0.1.0` и прикрепляет оба установщика к GitHub Release.
-
-## Публикация в GitHub
-
-Репозиторий должен содержать только исходный код, тесты, конфигурацию сборки и документацию. Пользовательские документы, `.venv`, `_keys.json`, `_clean` и `_restored` исключены через `.gitignore`.
-
-После создания пустого репозитория на GitHub добавьте его адрес:
-
-```bash
-git remote add origin https://github.com/USERNAME/REPOSITORY.git
-git push -u origin main
-git tag -a v0.1.0 -m "Release v0.1.0"
-git push origin v0.1.0
-```
-
-После отправки тега GitHub Actions соберёт `.dmg` и Windows installer.

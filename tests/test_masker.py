@@ -24,6 +24,13 @@ class MaskerExtractionTests(unittest.TestCase):
         self.assertEqual(masker.mapping, {"+7 999 123-45-67": "[PHONE_1]"})
         self.assertEqual(masker.counters["PHONE"], 1)
 
+    def test_regex_fallback_survives_unavailable_ner(self):
+        masker = Masker(enable_ner=True)
+        masker._get_ner = lambda: (_ for _ in ()).throw(RuntimeError("model unavailable"))
+        cleaned = masker.mask_text("Телефон +7 999 123-45-67")
+        self.assertEqual(cleaned, "Телефон [PHONE_1]")
+        self.assertTrue(masker._ner_unavailable)
+
 
 if __name__ == "__main__":
     unittest.main()

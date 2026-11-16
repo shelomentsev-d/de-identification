@@ -407,7 +407,17 @@ class MainWindow(QMainWindow):
         self._refresh_mask_lists()
         self.mask_button.setEnabled(True)
         self.progress.hide()
-        self.status_label.setText("Готово. Проверьте файлы справа перед отправкой.")
+        completed = sum(item.status.value == "обработан" for item in self.queue.items)
+        failed = [item for item in self.queue.items if item.status.value == "ошибка"]
+        if failed:
+            details = "; ".join(f"{item.path.name}: {item.error}" for item in failed)
+            self.status_label.setText(
+                f"Создано файлов: {completed}. Ошибок: {len(failed)} — {details}"
+            )
+        else:
+            self.status_label.setText(
+                f"Готово. Создано файлов: {completed}. Проверьте файлы справа."
+            )
 
     def _clear_worker(self) -> None:
         if self.worker is not None:

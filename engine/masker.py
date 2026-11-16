@@ -15,6 +15,7 @@ class Masker:
         self.counters = {label: 0 for label in LABELS}
         self.enable_ner = enable_ner
         self._ner = None
+        self._ner_unavailable = False
 
     def _get_ner(self):
         if self._ner is None:
@@ -43,18 +44,20 @@ class Masker:
                 else:
                     spans.append((match.start(), match.end(), label, match.group(0)))
 
-        if self.enable_ner:
+        if self.enable_ner and not self._ner_unavailable:
             try:
                 segmenter, tagger, doc_type = self._get_ner()
-            except ImportError:
-                segmenter = None
-            if segmenter and any(char.isalpha() for char in text):
-                doc = doc_type(text)
-                doc.segment(segmenter)
-                doc.tag_ner(tagger)
-                for span in doc.spans:
-                    if span.type in ("PER", "ORG", "LOC"):
-                        spans.append((span.start, span.stop, span.type, span.text))
+                if any(char.isalpha() for char in text):
+                    doc = doc_type(text)
+                    doc.segment(segmenter)
+                    doc.tag_ner(tagger)
+                    for span in doc.spans:
+                        if span.type in ("PER", "ORG", "LOC"):
+                            spans.append((span.start, span.stop, span.type, span.text))
+            except Exception:
+                # NER is optional. Regex masking must still work in frozen builds
+                # where Natasha's model data is unavailable or incomplete.
+                self._ner_unavailable = True
         return spans
 
     def mask_text(self, text: str) -> str:
