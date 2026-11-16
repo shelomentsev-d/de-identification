@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local and generated artifacts
+.DS_Store
+*_clean.*
+*_keys.json
+*_restored.*
+
+# Local test/output folders
+.coverage
+.pytest_cache/
+
+# Build artifacts
+build/
+dist/
+*.spec.bak
+
+# IDE and release metadata
+.idea/
+.vscode/
+*.log
+
+# User-local samples and macOS metadata
+*.dmg
+*.app/
+.DS_Store
+
+# Local source material
+Инструкция по обезличиванию.md

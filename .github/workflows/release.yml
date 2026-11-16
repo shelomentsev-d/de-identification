@@ -1,0 +1,78 @@
+name: Build releases
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-build.txt
+      - name: Build application
+        run: |
+          python -m PyInstaller --clean --noconfirm pyinstaller/pii_mask.spec
+      - name: Create DMG
+        run: |
+          mkdir -p dist/dmg
+          xattr -cr "dist/De-identification.app"
+          codesign --force --deep --sign - "dist/De-identification.app"
+          mkdir -p dist/dmg-root
+          cp -R "dist/De-identification.app" dist/dmg-root/
+          ln -s /Applications dist/dmg-root/Applications
+          hdiutil create -volname "De-identification" -srcfolder dist/dmg-root -ov -format UDZO "dist/dmg/De-identification.dmg"
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: De-identification-macOS
+          path: dist/dmg/De-identification.dmg
+      - name: Attach macOS artifact to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/dmg/De-identification.dmg
+
+  windows:
+    runs-on: windows-2022
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-build.txt
+      - name: Build application
+        run: python -m PyInstaller --clean --noconfirm pyinstaller/pii_mask.spec
+      - name: Build Windows installer
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: installer/De-identification.iss
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: De-identification-Windows
+          path: dist/windows/De-identification-Setup.exe
+      - name: Attach Windows artifact to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/windows/De-identification-Setup.exe

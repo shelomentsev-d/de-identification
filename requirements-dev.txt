@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# The project currently uses the standard-library unittest runner.
+# pytest is optional for contributors who prefer it.
+pytest>=8,<10
