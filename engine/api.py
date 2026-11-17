@@ -140,6 +140,7 @@ def _token_pattern(token: str) -> re.Pattern[str]:
         + re.escape(label)
         + r"[\s_]??"
         + re.escape(number)
+        + r"(?!\d)"
         + r"[\]\)\»\"']?"
     )
 

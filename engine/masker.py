@@ -3,8 +3,33 @@
 from __future__ import annotations
 
 import re
+import sys
+from pathlib import Path
 
 from .rules import LABELS, REGEX_RULES, filter_overlaps
+
+
+def _bundled_data(*parts: str) -> str | None:
+    """Return a data file shipped next to a frozen app, if it is on disk.
+
+    PyInstaller keeps pure-Python modules in an archive, so natasha's
+    ``dirname(__file__)`` does not point at the extracted ``.tar`` models.
+    On macOS those files land in ``Contents/Resources``; on Windows and in
+    onefile mode they land under ``sys._MEIPASS``.
+    """
+    if not getattr(sys, "frozen", False):
+        return None
+    roots = []
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        roots.append(Path(meipass))
+        roots.append(Path(meipass).parent / "Resources")
+    roots.append(Path(sys.executable).resolve().parent.parent / "Resources")
+    for root in roots:
+        candidate = root.joinpath(*parts)
+        if candidate.is_file():
+            return str(candidate)
+    return None
 
 
 class Masker:
@@ -21,9 +46,13 @@ class Masker:
         if self._ner is None:
             from natasha import Doc, NewsEmbedding, NewsNERTagger, Segmenter
 
+            # In a PyInstaller .app the model files land in Contents/Resources,
+            # while natasha computes its paths from __file__ inside the archive.
+            embedding_path = _bundled_data("natasha", "data", "emb", "navec_news_v1_1B_250K_300d_100q.tar")
+            ner_path = _bundled_data("natasha", "data", "model", "slovnet_ner_news_v1.tar")
             segmenter = Segmenter()
-            embedding = NewsEmbedding()
-            tagger = NewsNERTagger(embedding)
+            embedding = NewsEmbedding(embedding_path) if embedding_path else NewsEmbedding()
+            tagger = NewsNERTagger(embedding, ner_path) if ner_path else NewsNERTagger(embedding)
             self._ner = (segmenter, tagger, Doc)
         return self._ner
 
@@ -40,7 +69,13 @@ class Masker:
             for match in re.finditer(pattern, text):
                 if match.re.groups:
                     start, stop = match.span(1)
-                    spans.append((start, stop, label, match.group(1)))
+                    value = match.group(1)
+                    # Keep the full match as a hidden priority boundary for
+                    # prefixed forms such as "Индивидуальный Предприниматель".
+                    # The public span still replaces only the captured name.
+                    spans.append((start, stop, label, value))
+                    if match.start() < start:
+                        spans.append((match.start(), start, "__PREFIX__", ""))
                 else:
                     spans.append((match.start(), match.end(), label, match.group(0)))
 

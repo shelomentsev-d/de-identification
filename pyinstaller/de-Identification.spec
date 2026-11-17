@@ -2,24 +2,46 @@
 from pathlib import Path
 import sys
 
+from PyInstaller.utils.hooks import collect_all
+
 project = Path(SPECPATH).parent
+
+# natasha and its dependencies ship model/dictionary files (.tar, .txt, DAWG)
+# that PyInstaller does not pick up from hiddenimports alone.
+NER_PACKAGES = [
+    "natasha",
+    "navec",
+    "slovnet",
+    "razdel",
+    "yargy",
+    "ipymarkup",
+    "intervaltree",
+    "pymorphy2",
+    "pymorphy2_dicts_ru",
+    "dawg_python",
+]
+ner_datas, ner_binaries, ner_hiddenimports = [], [], []
+for package in NER_PACKAGES:
+    pkg_datas, pkg_binaries, pkg_hidden = collect_all(package)
+    ner_datas += pkg_datas
+    ner_binaries += pkg_binaries
+    ner_hiddenimports += pkg_hidden
 
 
 a = Analysis(
     [str(project / "run_app.py")],
     pathex=[str(project)],
-    binaries=[],
+    binaries=ner_binaries,
     datas=[
         (str(project / "assets" / "de-Identification.icns"), "."),
         (str(project / "assets" / "de-Identification.ico"), "."),
-    ],
+    ] + ner_datas,
     hiddenimports=[
         "docx",
         "openpyxl",
         "pptx",
         "pypdf",
-        "natasha",
-    ],
+    ] + ner_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -23,29 +23,47 @@ from engine.masker import Masker
 from engine.rules import LABELS, REGEX_RULES, filter_overlaps
 
 
+def replace_paragraph_spans(p, replacements):
+    """Replace all spans in one pass without losing text between runs.
+
+    Word often splits one visible word across several runs. Rebuilding the
+    paragraph text once avoids stale offsets and the character loss caused by
+    replacing spans one by one.
+    """
+    runs = list(p.runs)
+    if not runs:
+        return
+    positions = []
+    position = 0
+    for run in runs:
+        start = position
+        position += len(run.text)
+        positions.append((start, position))
+
+    def run_index(char_position):
+        for index, (start, end) in enumerate(positions):
+            if start <= char_position < end:
+                return index
+        return len(runs) - 1
+
+    rendered = []
+    cursor = 0
+    for start, stop, token in replacements:
+        rendered.append(p.text[cursor:start])
+        rendered.append(token)
+        cursor = stop
+    rendered.append(p.text[cursor:])
+    replacement_text = "".join(rendered)
+
+    first = run_index(0)
+    runs[first].text = replacement_text
+    for run in runs[first + 1:]:
+        run.text = ""
+
+
 def apply_span_to_paragraph(p, start, stop, token):
-    """Заменить [start:stop) в абзаце docx с сохранением форматирования:
-    вставка делается в run(ы), а не через p.text (которое схлопывает разметку)."""
-    pos = 0
-    hit = []
-    for r in p.runs:
-        rl = len(r.text)
-        rs, re_ = pos, pos + rl
-        if rs < stop and re_ > start:
-            hit.append((r, max(start - rs, 0), min(stop - rs, rl)))
-        pos = re_
-    if not hit:
-        return False
-    if len(hit) == 1:
-        r, a, b = hit[0]
-        r.text = r.text[:a] + token + r.text[b:]
-    else:
-        r0, a0, _ = hit[0]
-        r0.text = r0.text[:a0] + token
-        for r, _, _ in hit[1:-1]:
-            r.text = ""
-        r1, _, b1 = hit[-1]
-        r1.text = r1.text[b1:]
+    """Compatibility helper for callers that replace one span."""
+    replace_paragraph_spans(p, [(start, stop, token)])
     return True
 
 
@@ -58,12 +76,11 @@ def process_docx(path, masker):
         if not text.strip():
             return
         spans = filter_overlaps(masker.find_spans(text))
-        for start, stop, label, value in sorted(spans, key=lambda s: s[0],
-                                                reverse=True):
-            token = masker.token_for(value, label)
-            if not apply_span_to_paragraph(p, start, stop, token):
-                p.text = masker.mask_text(text)  # запасной вариант
-                return
+        replacements = []
+        for start, stop, label, value in spans:
+            replacements.append((start, stop, masker.token_for(value, label)))
+        if replacements:
+            replace_paragraph_spans(p, replacements)
 
     def walk_tables(tables):
         for t in tables:

@@ -51,6 +51,15 @@ class EngineApiTests(unittest.TestCase):
         self.assertEqual(result.text, "Компания и Компания")
         self.assertEqual(result.replacements, 2)
 
+    def test_restore_does_not_confuse_token_number_prefixes(self):
+        result = restore(
+            "[ORG_1] и [ORG_10] и [ORG_11]",
+            {"Первая": "[ORG_1]", "Десятая": "[ORG_10]", "Одиннадцатая": "[ORG_11]"},
+        )
+        self.assertEqual(result.text, "Первая и Десятая и Одиннадцатая")
+        self.assertEqual(result.replacements, 3)
+        self.assertEqual(result.missing_tokens, ())
+
     def test_mask_rejects_missing_and_unsupported_inputs(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
